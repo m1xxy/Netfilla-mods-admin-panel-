@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>NetFilla Admin - Mod APKs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary-red: #E50914; --bg-dark: #000000; }
+        body { margin: 0; background-color: #09090b; font-family: 'Inter', sans-serif; color: #fff; -webkit-font-smoothing: antialiased; }
+        
+        /* Mobile Constraint Wrapper */
+        .mobile-container { width: 100%; max-width: 480px; margin: 0 auto; min-height: 100dvh; background-color: var(--bg-dark); position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.8); overflow-x: hidden; }
+
+        .ios-glass { background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .admin-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white; padding: 14px 16px; width: 100%; outline: none; font-size: 14px; }
+        .admin-input:focus { border-color: var(--primary-red); }
+        ::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="flex justify-center">
+
+    <div class="mobile-container flex flex-col">
+
+        <!-- LOGIN SCREEN -->
+        <div id="admin-login-screen" class="absolute inset-0 z-50 bg-black flex flex-col items-center justify-center p-6">
+            <div class="w-full ios-glass p-8 rounded-3xl text-center shadow-2xl border border-white/10">
+                <div class="w-16 h-16 bg-[#E50914] rounded-full mx-auto flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(229,9,20,0.5)]">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M4 4L9 20L15 4L20 20"/></svg>
+                </div>
+                <h1 class="text-2xl font-black tracking-tight mb-1">Admin Portal</h1>
+                <p class="text-sm text-gray-400 mb-6 font-medium">Manage Mod APKs</p>
+                <form id="admin-login-form" class="flex flex-col gap-4">
+                    <input type="text" id="admin-email" placeholder="Admin ID" class="admin-input" required>
+                    <input type="password" id="admin-password" placeholder="Password" class="admin-input" required>
+                    <button type="submit" class="w-full bg-[#E50914] text-white font-bold py-3.5 rounded-xl mt-2 active:scale-95 transition text-[15px]">Login</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="admin-dashboard" class="hidden flex-1 flex flex-col relative">
+            <header class="w-full ios-glass sticky top-0 z-40 px-5 py-4 flex justify-between items-center border-b border-white/5">
+                <div class="flex items-center gap-2">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E50914" stroke-width="3"><path d="M4 4L9 20L15 4L20 20"/></svg>
+                    <span class="font-bold text-lg">NetFilla Mods</span>
+                </div>
+                <button onclick="adminLogout()" class="text-red-500 text-xs font-bold bg-red-500/10 px-3 py-1.5 rounded-full active:scale-95">Sign Out</button>
+            </header>
+
+            <main class="flex-1 overflow-y-auto p-5 pb-24">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 class="text-2xl font-black">App Manager</h2>
+                        <p class="text-gray-400 text-xs mt-1">Live database of Premium Mods</p>
+                    </div>
+                </div>
+
+                <!-- APK Cards Container -->
+                <div id="links-container" class="flex flex-col gap-3">
+                    <div class="text-center py-10 text-gray-500 text-sm">Loading database...</div>
+                </div>
+            </main>
+
+            <!-- Floating Add Button -->
+            <button onclick="openModal('add-link-modal')" class="absolute bottom-6 right-5 bg-[#E50914] w-14 h-14 rounded-full flex items-center justify-center shadow-[0_4px_20px_rgba(229,9,20,0.5)] active:scale-90 transition-transform z-40">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+        </div>
+
+        <!-- MODAL: ADD LINK -->
+        <div id="add-link-modal" class="hidden absolute inset-0 z-50 bg-black/90 backdrop-blur-md flex-col justify-end">
+            <div class="w-full ios-glass rounded-t-3xl p-6 relative border-t border-white/10 mt-auto shadow-[0_-20px_50px_rgba(0,0,0,0.5)] animate-[slideUp_0.3s_ease-out]">
+                <button onclick="closeModal('add-link-modal')" class="absolute top-4 right-4 bg-white/10 p-1.5 rounded-full text-white/50"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+                <h2 class="text-xl font-bold mb-4">Add Mod APK</h2>
+                <form id="add-link-form" class="flex flex-col gap-3">
+                    <input type="text" id="app-name" placeholder="App Name (e.g. Spotify Premium)" class="admin-input" required>
+                    <input type="text" id="app-desc" placeholder="Short description" class="admin-input" required>
+                    <input type="url" id="app-url" placeholder="MediaFire Link" class="admin-input" required>
+                    <div>
+                        <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block px-1">Upload Icon (Auto ImgBB)</label>
+                        <input type="file" id="app-icon" accept="image/*" class="admin-input py-2" required>
+                    </div>
+                    <button type="submit" id="submit-btn" class="w-full bg-white text-black font-bold py-3.5 rounded-xl mt-2 active:scale-95 transition">Upload to Server</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Firebase & ImgBB Logic -->
+    <style>@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }</style>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // NEW FIREBASE CONFIG (Doha Center)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAxv0kNe_rHAenbSJWnTEhw5q0s2jSq_lo",
+            authDomain: "doha-center.firebaseapp.com",
+            databaseURL: "https://doha-center-default-rtdb.firebaseio.com",
+            projectId: "doha-center",
+            storageBucket: "doha-center.firebasestorage.app",
+            messagingSenderId: "818788344432",
+            appId: "1:818788344432:web:acb930b0df7357e33d8ab5",
+            measurementId: "G-8EH3J82NHX"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // IMGBB API KEY
+        const IMGBB_API_KEY = "YOUR_IMGBB_API_KEY_HERE"; 
+
+        const ADMIN_EMAIL = "NetFilla@admin";
+        const ADMIN_PASS = "Moiz42372@"; 
+
+        if(sessionStorage.getItem('netfilla_admin') === 'true') showDashboard();
+
+        document.getElementById('admin-login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (document.getElementById('admin-email').value === ADMIN_EMAIL && document.getElementById('admin-password').value === ADMIN_PASS) {
+                sessionStorage.setItem('netfilla_admin', 'true'); showDashboard();
+            } else alert("Invalid Credentials!");
+        });
+
+        window.adminLogout = () => { sessionStorage.removeItem('netfilla_admin'); location.reload(); }
+        window.openModal = (id) => { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
+        window.closeModal = (id) => { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
+
+        function showDashboard() {
+            document.getElementById('admin-login-screen').classList.add('hidden');
+            document.getElementById('admin-dashboard').classList.remove('hidden');
+            fetchLinks();
+        }
+
+        async function fetchLinks() {
+            const container = document.getElementById('links-container');
+            container.innerHTML = `<div class="text-center py-10 text-gray-500 text-sm">Fetching Mods...</div>`;
+            try {
+                const querySnapshot = await getDocs(collection(db, "mod_apks"));
+                container.innerHTML = "";
+                if (querySnapshot.empty) { container.innerHTML = `<div class="text-center py-10 text-gray-500 text-sm">No Mods uploaded yet.</div>`; return; }
+
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    container.innerHTML += `
+                        <div class="ios-glass p-3 rounded-2xl flex items-center gap-3">
+                            <img src="${data.iconUrl}" class="w-12 h-12 rounded-xl object-cover bg-black">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-[14px] leading-tight">${data.name}</h3>
+                                <p class="text-xs text-gray-400 mt-0.5 line-clamp-1">${data.desc}</p>
+                            </div>
+                            <button onclick="deleteLink('${docSnap.id}')" class="bg-red-500/20 text-red-500 p-2 rounded-lg active:scale-90">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                    `;
+                });
+            } catch (error) { container.innerHTML = `<div class="text-red-500 text-sm text-center">Error: ${error.message}</div>`; }
+        }
+
+        async function uploadImageToImgbb(file) {
+            if(IMGBB_API_KEY === "YOUR_IMGBB_API_KEY_HERE") throw new Error("Please put your real ImgBB API key in the code!");
+            const formData = new FormData(); formData.append('image', file);
+            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
+            const data = await res.json();
+            if(data.success) return data.data.url;
+            throw new Error(data.error.message);
+        }
+
+        document.getElementById('add-link-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            btn.innerText = "Uploading Image..."; btn.disabled = true;
+
+            try {
+                const name = document.getElementById('app-name').value;
+                const desc = document.getElementById('app-desc').value;
+                const url = document.getElementById('app-url').value;
+                const imageFile = document.getElementById('app-icon').files[0];
+
+                const iconUrl = await uploadImageToImgbb(imageFile);
+                btn.innerText = "Saving to Database...";
+
+                await setDoc(doc(db, "mod_apks", Date.now().toString()), { name, desc, downloadUrl: url, iconUrl, createdAt: serverTimestamp() });
+                
+                alert("Mod APK added successfully!");
+                document.getElementById('add-link-form').reset();
+                closeModal('add-link-modal');
+                fetchLinks();
+            } catch(error) { alert("Error: " + error.message); }
+            btn.innerText = "Upload to Server"; btn.disabled = false;
+        });
+
+        window.deleteLink = async function(id) {
+            if(confirm("Remove this Mod APK?")) {
+                await deleteDoc(doc(db, "mod_apks", id)); fetchLinks();
+            }
+        }
+    </script>
+</body>
+</html>
